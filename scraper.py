@@ -4,13 +4,15 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import re
 
-chromedriver_location=('INSERT YOUR CHROMERDRIVER LOCATION HERE')
+#chromedriver_location=('/usr/lib/chromium-browser/chromedriver')
+
+#PLACE CHROMEDRIVER LOCATION
 
 filename = "indeedscraped.csv"
 
 f = open(filename, "w")
 
-headers = "jobTitle, jobCategory, jobCompany, salary, url\n"
+headers = "jobTitle, jobCategory, jobCompany, jobDescription, salary, url\n"
 
 f.write(headers)
 
@@ -41,7 +43,7 @@ for link in links:
         jobtitle = data.div.h1.text.strip().replace(",", ";")
         jobcompanyBrute = driver.find_element_by_xpath("/html/body/div[1]/div[1]/div[3]/div/div/div[1]/div[1]/div[2]/div[2]")
         jobCompanyClean = jobcompanyBrute.text.partition("-")[0].replace(",", ";")
-        jobDescriptionRaw = driver.find_element_by_xpath("//*[@id='jobDescriptionText']").text.replace(',', ";")
+        jobDescriptionRaw = driver.find_element_by_xpath("//*[@id='jobDescriptionText']").text.replace(',', ";").replace('\n', ' ')
         salarysubstring = "Salary"
         salary = "-99notscrapable"
         categorybrute = driver.find_element_by_xpath("/html/body/div[1]/div[1]/div[3]/div/div/div[1]/div[2]/div/div/div[1]").text
@@ -49,7 +51,7 @@ for link in links:
         joblink = driver.current_url.replace(",", ";")
 
 
-        csvLineEntries = [jobtitle.replace(",", " "), categoryclean.replace(",", " "), jobCompanyClean.replace(",", " "), salary.replace(",", " "), joblink.replace(",", " ")]
+        csvLineEntries = [jobtitle.replace(",", " "), categoryclean.replace(",", " "), jobCompanyClean.replace(",", " "), jobDescriptionRaw.replace(",", " "),  salary.replace(",", " "), joblink.replace(",", " ")]
         csvLine = ','.join([entry.replace('\n', ' ') for entry in csvLineEntries])
 
         f.write(csvLine + '\n')
